@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱心吐槽大会</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f9ff, #e1f5fe, #b3e5fc);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial Rounded MT Bold', 'Microsoft YaHei', sans-serif;
+            overflow: hidden;
+        }
+        
+        .header {
+            position: absolute;
+            top: 20px;
+            text-align: center;
+            color: #ff4081;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .heart-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .heart {
+            font-size: 100px;
+            color: hotpink;
+            cursor: pointer;
+            position: relative;
+            z-index: 5;
+            filter: drop-shadow(0 0 10px rgba(255, 64, 129, 0.5));
+            transition: transform 0.3s;
+        }
+        
+        .heart:hover {
+            transform: scale(1.1);
+        }
+        
+        @keyframes dance {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-10deg) scale(1.3); }
+            50% { transform: rotate(10deg) scale(1); }
+            75% { transform: rotate(-5deg) scale(1.2); }
+            100% { transform: rotate(5deg) scale(1.1); }
+        }
+        
+        .dancing {
+            animation: dance 2s infinite alternate;
+        }
+        
+        .dialog {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin-top: 30px;
+            font-size: 18px;
+            color: #333;
+            max-width: 300px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 5;
+            transition: all 0.3s;
+        }
+        
+        .dialog:after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
+        
+        .text {
+            margin-top: 15px;
+            color: #666;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .counter {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #666;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .floating-hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .floating-heart {
+            position: absolute;
+            font-size: 24px;
+            color: rgba(255, 64, 129, 0.7);
+            opacity: 0;
+            animation: floatUp 4s ease-out forwards;
+        }
+        
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #ff4081;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff4081;
+            animation: float 5s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            25% {
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-20px) translateX(10px);
+                opacity: 1;
+            }
+            75% {
+                opacity: 0.7;
+            }
+        }
+        
+        .mood-meter {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #666;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mood-value {
+            font-weight: bold;
+            color: #ff4081;
+        }
+        
+        .special-effects {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            color: #ff4081;
+            text-shadow: 0 0 20px rgba(255, 64, 129, 0.7);
+            z-index: 20;
+            animation: popIn 0.5s forwards;
+        }
+        
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            70% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .funny-images {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 15;
+            display: none;
+            animation: imagePop 0.8s forwards;
+        }
+        
+        @keyframes imagePop {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            70% { transform: scale(1.1) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        .emoji-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        
+        .emoji {
+            font-size: 30px;
+            animation: emojiBounce 2s infinite;
+        }
+        
+        @keyframes emojiBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .emoji:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .emoji:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>❤️ 爱心吐槽大会 ❤️</h1>
+        <p>点击爱心，收获今日份快乐！</p>
+    </div>
+    
+    <div class="heart-container">
+        <div class="heart dancing">❤️</div>
+    </div>
+    
+    <div class="dialog">
+        本爱心申请成为你的快乐源泉！<br>
+        不接受反驳→_→
+        <div class="emoji-container">
+            <div class="emoji">😂</div>
+            <div class="emoji">🤣</div>
+            <div class="emoji">😜</div>
+        </div>
+    </div>
+    
+    <div class="text">（点击爱心，它会更嚣张哦~）</div>
+    
+    <div class="counter">
+        今日吐槽次数: <span id="clickCount">0</span>
+    </div>
+    
+    <div class="mood-meter">
+        爱心心情值: <span class="mood-value" id="moodValue">100</span>
+    </div>
+    
+    <div class="floating-hearts" id="floatingHearts"></div>
+    <div class="particles" id="particles"></div>
+    <div class="special-effects" id="specialEffects"></div>
+    <div class="funny-images" id="funnyImages"></div>
+
+    <script>
+        const heart = document.querySelector('.heart');
+        const dialog = document.querySelector('.dialog');
+        const clickCountElement = document.getElementById('clickCount');
+        const moodValueElement = document.getElementById('moodValue');
+        const floatingHeartsContainer = document.getElementById('floatingHearts');
+        const particlesContainer = document.getElementById('particles');
+        const specialEffects = document.getElementById('specialEffects');
+        const funnyImages = document.getElementById('funnyImages');
+        
+        let clickCount = 0;
+        let moodValue = 100;
+        
+        const jokes = [
+            "笑一个！不然我就一直扭~",
+            "听说你不开心？我来卖萌啦！",
+            "别emo了，我比你还会装可爱",
+            "叮！快乐充值成功√",
+            "警告！再不笑我就放大招了！",
+            "本爱心可是有脾气的！",
+            "你戳疼我了，要负责！",
+            "再点我，我就...亲你一下！",
+            "今天也是被你宠坏的一天~",
+            "你成功引起了本爱心的注意！",
+            "本爱心决定今天只对你营业！",
+            "你点的不是爱心，是快乐！",
+            "本爱心申请成为你的专属快乐！",
+            "警告！你的快乐值已超标！",
+            "本爱心今天心情超好，因为有你~"
+        ];
+        
+        const colors = ['hotpink', 'red', 'orange', 'purple', 'pink', '#ff4081', '#e91e63', '#9c27b0'];
+        
+        // 搞笑图片URL数组
+        const funnyImageUrls = [
+            'https://img.zcool.cn/community/01f6b55c4e8c15a801208f8bfa5c05.jpg@1280w_1l_2o_100sh.jpg',
+            'https://img.zcool.cn/community/0145e55c4e8c16a801208f8b1a5a7f.jpg@1280w_1l_2o_100sh.jpg',
+            'https://img.zcool.cn/community/019d0c5c4e8c16a801208f8b9b1f93.jpg@1280w_1l_2o_100sh.jpg',
+            'https://img.zcool.cn/community/01e3b65c4e8c16a801208f8b8c5f7e.jpg@1280w_1l_2o_100sh.jpg',
+            'https://img.zcool.cn/community/01e8c65c4e8c15a801208f8b3c7c2b.jpg@1280w_1l_2o_100sh.jpg'
+        ];
+        
+        // 创建粒子背景
+        function createParticles() {
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // 随机位置
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                
+                // 随机大小
+                const size = Math.random() * 6 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // 随机动画延迟
+                const delay = Math.random() * 5;
+                particle.style.animationDelay = `${delay}s`;
+                
+                // 随机颜色
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.background = color;
+                particle.style.boxShadow = `0 0 10px ${color}`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // 创建浮动爱心效果
+        function createFloatingHearts() {
+            const heartCount = 5;
+            
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('floating-heart');
+                heart.innerHTML = '❤️';
+                
+                // 随机位置
+                const posX = Math.random() * window.innerWidth;
+                const posY = window.innerHeight + 20;
+                heart.style.left = `${posX}px`;
+                heart.style.top = `${posY}px`;
+                
+                // 随机动画参数
+                const delay = Math.random() * 0.5;
+                const duration = 2 + Math.random() * 2;
+                const distance = 100 + Math.random() * 100;
+                
+                heart.style.animation = `floatUp ${duration}s ease-out ${delay}s forwards`;
+                
+                floatingHeartsContainer.appendChild(heart);
+                
+                // 动画结束后移除元素
+                setTimeout(() => {
+                    if (heart.parentNode) {
+                        heart.parentNode.removeChild(heart);
+                    }
+                }, (duration + delay) * 1000);
+            }
+        }
+        
+        // 显示特殊效果
+        function showSpecialEffect(text) {
+            specialEffects.textContent = text;
+            specialEffects.style.display = 'block';
+            
+            setTimeout(() => {
+                specialEffects.style.display = 'none';
+            }, 1500);
+        }
+        
+        // 显示搞笑图片
+        function showFunnyImage() {
+            // 随机选择图片
+            const randomImageUrl = funnyImageUrls[Math.floor(Math.random() * funnyImageUrls.length)];
+            
+            // 设置图片
+            funnyImages.style.backgroundImage = `url(${randomImageUrl})`;
+            funnyImages.style.backgroundSize = 'cover';
+            funnyImages.style.backgroundPosition = 'center';
+            
+            // 随机位置
+            const posX = 50 + (Math.random() * 40 - 20); // 30% 到 70% 之间
+            const posY = 40 + (Math.random() * 30 - 15); // 25% 到 55% 之间
+            
+            funnyImages.style.left = `${posX}%`;
+            funnyImages.style.top = `${posY}%`;
+            
+            // 显示图片
+            funnyImages.style.display = 'block';
+            
+            // 3秒后隐藏图片
+            setTimeout(() => {
+                funnyImages.style.display = 'none';
+            }, 3000);
+        }
+        
+        // 处理点击事件
+        heart.addEventListener('click', () => {
+            clickCount++;
+            clickCountElement.textContent = clickCount;
+            
+            // 更新心情值
+            moodValue = Math.min(100, moodValue + 5);
+            moodValueElement.textContent = moodValue;
+            
+            // 随机选择笑话
+            const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+            dialog.innerHTML = randomJoke;
+            
+            // 添加表情包
+            const emojiContainer = document.createElement('div');
+            emojiContainer.className = 'emoji-container';
+            
+            // 随机选择3个不同的emoji
+            const emojis = ['😂', '🤣', '😜', '😍', '😎', '🥳', '😇', '🤩', '😘', '🥰'];
+            const selectedEmojis = [];
+            while (selectedEmojis.length < 3) {
+                const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                if (!selectedEmojis.includes(randomEmoji)) {
+                    selectedEmojis.push(randomEmoji);
+                }
+            }
+            
+            selectedEmojis.forEach(emoji => {
+                const emojiElement = document.createElement('div');
+                emojiElement.className = 'emoji';
+                emojiElement.textContent = emoji;
+                emojiContainer.appendChild(emojiElement);
+            });
+            
+            dialog.appendChild(emojiContainer);
+            
+            // 随机改变爱心颜色
+            heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+            
+            // 创建浮动爱心
+            createFloatingHearts();
+            
+            // 每3次点击显示搞笑图片
+            if (clickCount % 3 === 0) {
+                showFunnyImage();
+            }
+            
+            // 每5次点击显示特殊效果
+            if (clickCount % 5 === 0) {
+                showSpecialEffect('暴击！快乐翻倍！');
+            }
+            
+            // 每10次点击显示特殊效果
+            if (clickCount % 10 === 0) {
+                showSpecialEffect('终极快乐！');
+            }
+            
+            // 添加点击缩放效果
+            heart.style.transform = 'scale(1.3)';
+            setTimeout(() => {
+                heart.style.transform = 'scale(1)';
+            }, 300);
+        });
+        
+        // 初始化粒子效果
+        createParticles();
+        
+        // 定期创建浮动爱心
+        setInterval(() => {
+            createFloatingHearts();
+        }, 3000);
+        
+        // 定期减少心情值
+        setInterval(() => {
+            if (moodValue > 0) {
+                moodValue = Math.max(0, moodValue - 1);
+                moodValueElement.textContent = moodValue;
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
